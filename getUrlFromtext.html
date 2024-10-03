@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Get Url From Text</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<script>
+			$(document).ready(function() {
+				$("#input").on( "change", function() {
+					const regexp = /http[s]?:\/\/[\w./?=%&-]*/g;
+					let urls = $(this).val().match(regexp);
+					
+					const output = $("#output");
+					output.html("");
+					for ( let i = 0; i < urls.length; i++ ) {
+						output.append( "<li><a href='"+urls[i]+"' target='_blank' rel='noreferrer noopenner'>"+urls[i]+"</a></li>" );
+					}
+				} );
+			} );
+		</script>
+	</head>
+	<body>
+		<textarea id="input" rows="4" cols="50" placeholder="Please input your Text here..."></textarea>
+		<div id="output"></div>
+	</body>
+</html>
