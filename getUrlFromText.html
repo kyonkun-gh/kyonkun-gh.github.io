@@ -20,9 +20,45 @@
 				} );
 			} );
 		</script>
+
+		<style type="text/css">
+			body {
+				font-family: Arial, sans-serif;
+				margin: 20px;
+				line-height: 1.6;
+			}
+			h1 {
+				color: #333;
+			}
+			textarea#input {
+				width: 100%;
+				max-width: 600px;
+				padding: 10px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+			}
+			div#output {
+				margin-top: 20px;
+				padding: 10px;
+				border: 1px solid #ddd;
+				border-radius: 5px;
+				background-color: #f9f9f9;
+				max-width: 600px;
+			}
+			div#output ul {
+				list-style-type: none;
+				padding: 0;
+				margin: 0;
+			}
+		</style>
 	</head>
+
 	<body>
+		<h1>Extract URLs from Text</h1>
 		<textarea id="input" rows="4" cols="50" placeholder="Please input your Text here..."></textarea>
-		<div id="output"></div>
+		<div id="output">
+			<ul></ul>
+		</div>
 	</body>
 </html>
