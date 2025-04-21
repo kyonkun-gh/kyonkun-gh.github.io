@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Base64 Format Split 2.0</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			var inputData, newData;
+			var base64Begin, base64End;
+			var isLoseData;
+			
+			$(document).ready( function() {
+				$('#input').bind("focusout", function(event) {
+					resultReload();
+				});
+				
+				$('input[name=base64BE]:radio').bind("change", function(event) {
+					$('div').show( "slow" );
+					
+					switch( $(this).val() ) {
+						case "rsaKey":
+							base64Begin = "-----BEGIN RSA PRIVATE KEY-----" + "\n";
+							base64End = "-----END RSA PRIVATE KEY-----";
+							isLoseData = false;
+							break;
+						case "rsaPubKey":
+							base64Begin = "-----BEGIN PUBLIC KEY-----" + "\n";
+							base64End = "-----END PUBLIC KEY-----";
+							isLoseData = true;
+							break;
+						case "crt":
+							base64Begin = "-----BEGIN CERTIFICATE-----" + "\n";
+							base64End = "-----END CERTIFICATE-----";
+							isLoseData = false;
+							break;
+						case "csr":
+							base64Begin = "-----BEGIN CERTIFICATE REQUEST-----" + "\n";
+							base64End = "-----END CERTIFICATE REQUEST-----";
+							isLoseData = false;
+							break;
+					}
+					
+					resultReload();
+				});
+			});
+			
+			function resultReload() {
+				inputData = $('#input').val();
+				
+				if ( inputData != "" ) {
+					//Replace Line Break
+					newData = inputData.replace(/\n/g,"");
+					//TL Lose Data RSA PUB KEY
+					if ( isLoseData ) {
+						newData = newData.replace( "MIIBC" , "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBC" );
+					}
+					
+					$('#output').val( toBase64( newData ) );
+				}
+			}
+			
+			function toBase64( base64Data ) {
+				var content, item, base64Result;
+				
+				content = base64Data.match(/.{1,64}/g);
+				
+				base64Result = base64Begin;
+				for (item in content) {
+					base64Result = base64Result + content[item] + "\n";
+				}
+				base64Result = base64Result + base64End;
+				
+				return base64Result;
+			}
+		</script>
+		
+		<style type="text/css">
+		.area {
+			position: relative;
+			height: auto;
+			width: 17%;
+			margin: 2px;
+			border: 2px solid;
+			/*float: left;*/
+		}
+		</style>
+	</head>
+	
+	<body>
+		Base64格式切割器 2.0<hr/>
+		
+		<label>請先選擇格式：</label>
+		<input type="radio" name="base64BE" value="rsaKey" /> RSA金鑰
+		<input type="radio" name="base64BE" value="rsaPubKey" /> RSA公鑰
+		<input type="radio" name="base64BE" value="crt" /> 憑證
+		<input type="radio" name="base64BE" value="csr" /> 憑證請求檔
+		<br>
+		
+		<div style="display:none">
+			<label>輸入Base64</label>
+			<textarea id="input" rows="10" cols="68"></textarea>
+		<br/><br/>
+			<label>輸出Base64</label>
+			<textarea id="output" rows="20" cols="68" readonly></textarea>
+		</div>
+	</body>
+</html>
