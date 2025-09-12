@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>IRR Calculator</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            input, button {
+                margin: 5px 0;
+                padding: 10px;
+                width: 100%;
+            }
+            .result {
+                margin-top: 20px;
+                font-weight: bold;
+            }
+            .cash-flow-row {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            .cash-flow-row input {
+                flex: 1;
+            }
+            .cash-flow-row button {
+                flex: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>IRR Calculator</h1>
+            <div id="cashFlowContainer">
+                <div class="cash-flow-row">
+                    <input type="number" placeholder="Year" class="year-input">
+                    <input type="number" placeholder="Cash Flow" class="cash-flow-input">
+                    <button onclick="removeCashFlowRow(this)">Remove</button>
+                </div>
+            </div>
+            <button onclick="addCashFlowRow()">Add Year</button>
+            <button onclick="calculateIRR()">Calculate IRR</button>
+            <div class="result" id="result"></div>
+        </div>
+
+        <script>
+            function addCashFlowRow() {
+                const container = document.getElementById('cashFlowContainer');
+                const row = document.createElement('div');
+                row.className = 'cash-flow-row';
+                row.innerHTML = `
+                    <input type="number" placeholder="Year" class="year-input">
+                    <input type="number" placeholder="Cash Flow" class="cash-flow-input">
+                    <button onclick="removeCashFlowRow(this)">Remove</button>
+                `;
+                container.appendChild(row);
+            }
+
+            function removeCashFlowRow(button) {
+                const row = button.parentElement;
+                row.remove();
+            }
+
+            function calculateIRR() {
+                const years = Array.from(document.querySelectorAll('.year-input')).map(input => parseInt(input.value));
+                const cashFlows = Array.from(document.querySelectorAll('.cash-flow-input')).map(input => parseFloat(input.value));
+
+                if (years.some(isNaN) || cashFlows.some(isNaN)) {
+                    document.getElementById('result').innerText = 'Please enter valid years and cash flows.';
+                    return;
+                }
+
+                const sortedCashFlows = [];
+                years.forEach((year, index) => {
+                    sortedCashFlows[year] = cashFlows[index];
+                });
+
+                const filledCashFlows = Array.from({ length: Math.max(...years) + 1 }, (_, i) => sortedCashFlows[i] || 0);
+
+                const irr = computeIRR(filledCashFlows);
+                if (irr !== null) {
+                    document.getElementById('result').innerText = `The IRR is ${irr.toFixed(2)}%.`;
+                } else {
+                    document.getElementById('result').innerText = 'Could not calculate IRR.';
+                }
+            }
+
+            function computeIRR(cashFlows, guess = 0.1) {
+                const maxIterations = 1000;
+                const precision = 1e-7;
+
+                let rate = guess;
+                for (let i = 0; i < maxIterations; i++) {
+                    const npv = cashFlows.reduce((acc, val, idx) => acc + val / Math.pow(1 + rate, idx), 0);
+                    const derivative = cashFlows.reduce((acc, val, idx) => acc - idx * val / Math.pow(1 + rate, idx + 1), 0);
+
+                    const newRate = rate - npv / derivative;
+                    if (Math.abs(newRate - rate) < precision) {
+                        return newRate * 100;
+                    }
+                    rate = newRate;
+                }
+                return null;
+            }
+        </script>
+    </body>
+</html>
+
+
